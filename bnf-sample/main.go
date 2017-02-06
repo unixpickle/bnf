@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/unixpickle/bnf"
 	"github.com/unixpickle/essentials"
@@ -37,6 +39,7 @@ func main() {
 		essentials.Die("grammar has no rules")
 	}
 
+	rand.Seed(time.Now().UnixNano())
 	rootName := g[0].Name
 	for i := 0; i < num; i++ {
 		out, err := bnf.Sample(g, rootName)
