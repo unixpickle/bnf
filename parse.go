@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"strconv"
 	"unicode"
 
 	"github.com/unixpickle/essentials"
@@ -101,8 +100,8 @@ const (
 	readingEqual
 	readingExprSpace
 	readingExprToken
-	readingExprStrNoBackslash
-	readingExprStrBackslash
+	readingExprStrDouble
+	readingExprStrSingle
 )
 
 type reader struct {
@@ -167,7 +166,9 @@ func (r *reader) Next(ch rune) (done bool, err error) {
 			r.exprs = append(r.exprs, r.currentExpr)
 			r.currentExpr = nil
 		} else if ch == '"' {
-			r.state = readingExprStrNoBackslash
+			r.state = readingExprStrDouble
+		} else if ch == '\'' {
+			r.state = readingExprStrSingle
 		} else if ch == '<' {
 			r.state = readingExprToken
 		} else if !unicode.IsSpace(ch) {
@@ -181,25 +182,15 @@ func (r *reader) Next(ch rune) (done bool, err error) {
 		} else {
 			r.currentExprData += string(ch)
 		}
-	case readingExprStrNoBackslash:
-		if ch == '"' {
-			esc := `"` + r.currentExprData + `"`
-			unesc, err := strconv.Unquote(esc)
-			if err != nil {
-				return true, err
-			}
-			r.currentExpr = append(r.currentExpr, &Token{Raw: unesc})
+	case readingExprStrDouble, readingExprStrSingle:
+		if (ch == '"' && r.state == readingExprStrDouble) ||
+			(ch == '\'' && r.state == readingExprStrSingle) {
+			r.currentExpr = append(r.currentExpr, &Token{Raw: r.currentExprData})
 			r.currentExprData = ""
 			r.state = readingExprSpace
 		} else {
 			r.currentExprData += string(ch)
-			if ch == '\\' {
-				r.state = readingExprStrBackslash
-			}
 		}
-	case readingExprStrBackslash:
-		r.currentExprData += string(ch)
-		r.state = readingExprStrNoBackslash
 	default:
 		panic("unknown state")
 	}

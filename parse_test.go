@@ -10,11 +10,11 @@ func TestParseSuccess(t *testing.T) {
 	var grammar = `
 <rule1> ::= <tok1>
 <rule2> ::= "hey"
-<rule3> ::= <tok1> "hey"
+<rule3> ::= <tok1> 'hey'
 <rule4> ::= <tok1> | "hey"
-<rule5> ::= <tok1> "hey" | "hey" <tok3>
-<YoRule-Hey> ::= <myToken-name> "hey\"quotes" |
-	<indented-token> | "yo" |
+<rule5> ::= <tok1> "hey" | 'hey' <tok3>
+<YoRule-Hey> ::= <myToken-name> 'hey"quotes' |
+	<indented-token> | "yo\" |
 	<hey>
 	`
 	g, err := ReadGrammar(bytes.NewBufferString(grammar))
@@ -28,7 +28,7 @@ func TestParseSuccess(t *testing.T) {
 		{"rule4", [][]*Token{{{Rule: "tok1"}}, {{Raw: "hey"}}}},
 		{"rule5", [][]*Token{{{Rule: "tok1"}, {Raw: "hey"}}, {{Raw: "hey"}, {Rule: "tok3"}}}},
 		{"YoRule-Hey", [][]*Token{{{Rule: "myToken-name"}, {Raw: "hey\"quotes"}},
-			{{Rule: "indented-token"}}, {{Raw: "yo"}}, {{Rule: "hey"}}}},
+			{{Rule: "indented-token"}}, {{Raw: "yo\\"}}, {{Rule: "hey"}}}},
 	})
 	if len(g) != len(expected) {
 		t.Fatalf("expected %d but got %d rules", len(expected), len(g))
