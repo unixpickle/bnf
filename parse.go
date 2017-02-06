@@ -126,11 +126,13 @@ func (r *reader) Next(ch rune) (done bool, err error) {
 	case readingRulePreSpace:
 		if unicode.IsSpace(ch) {
 			return
+		} else if ch == '<' {
+			r.state = readingRuleName
+		} else {
+			return true, fmt.Errorf("expected < but got %q", ch)
 		}
-		r.ruleName += string(ch)
-		r.state = readingRuleName
 	case readingRuleName:
-		if unicode.IsSpace(ch) {
+		if ch == '>' {
 			r.state = readingRuleNameSpace
 		} else {
 			r.ruleName += string(ch)

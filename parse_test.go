@@ -8,12 +8,12 @@ import (
 
 func TestParseSuccess(t *testing.T) {
 	var grammar = `
-rule1 ::= <tok1>
-rule2 ::= "hey"
-rule3 ::= <tok1> "hey"
-rule4 ::= <tok1> | "hey"
-rule5 ::= <tok1> "hey" | "hey" <tok3>
-YoRule-Hey ::= <myToken-name> "hey\"quotes" |
+<rule1> ::= <tok1>
+<rule2> ::= "hey"
+<rule3> ::= <tok1> "hey"
+<rule4> ::= <tok1> | "hey"
+<rule5> ::= <tok1> "hey" | "hey" <tok3>
+<YoRule-Hey> ::= <myToken-name> "hey\"quotes" |
 	<indented-token> | "yo" |
 	<hey>
 	`
